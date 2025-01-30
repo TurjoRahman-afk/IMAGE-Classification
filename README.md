@@ -19,9 +19,9 @@ os.getcwd()
 
 dataset_dir = '/Users/turjo/PycharmProjects/PythonProject3/cats and dogs'
 
-# ------------------------------------------------------------
-# Create Training and Validation Datasets
-# ------------------------------------------------------------
+
+# Create training and validation datasets
+
 batch_size = 32  # defining how many images will be loaded at once in each batch
 img_height = 150  # dimensions of each images
 img_width = 150 # dimensions of each images
@@ -45,7 +45,7 @@ for class_name in os.listdir(dataset_dir):
         all_images = os.listdir(class_path)
         random.shuffle(all_images)
 
-        # Split images into train, validation, and test sets
+        # split the training validation adn test datasets
         num_images = len(all_images)
         train_split = int(0.6 * num_images)  # 60% for training
         val_split = int(0.8 * num_images)  # 20% for validation, leaving 20% for testing
@@ -54,7 +54,7 @@ for class_name in os.listdir(dataset_dir):
         val_images = all_images[train_split:val_split]
         test_images = all_images[val_split:]
 
-        # Move images to their respective directories
+        
         for image_set, subset_dir in zip([train_images, val_images, test_images], [train_dir, val_dir, test_dir]):
             class_subset_dir = os.path.join(subset_dir, class_name)
             os.makedirs(class_subset_dir, exist_ok=True)
@@ -62,7 +62,7 @@ for class_name in os.listdir(dataset_dir):
                 shutil.copy(os.path.join(class_path, image), os.path.join(class_subset_dir, image))
 
 
-
+# data augmentation
 train_datagen = ImageDataGenerator(
     rescale=1. / 255,
     rotation_range=40,
@@ -101,7 +101,7 @@ test_generator = test_datagen.flow_from_directory(
 
 )
 
-
+# CNN model
 model = tf.keras.Sequential([
     tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_height, img_width, 3)),
     tf.keras.layers.MaxPooling2D(),
@@ -114,7 +114,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(len(train_generator.class_indices), activation='softmax')  # Number of classes
 ])
 
-
+# compile the model
 model.compile(
     optimizer='adam',
     loss='sparse_categorical_crossentropy',
@@ -122,7 +122,7 @@ model.compile(
 )
 
 
-
+# fit the data into the model
 epochs = 70
 history = model.fit(
     train_generator,
@@ -134,9 +134,9 @@ history = model.fit(
 test_loss, test_acc = model.evaluate(test_generator)
 print(f"Test accuracy: {test_acc:.2f}")
 
-# ------------------------------------------------------------
-# Plot Training and Validation Results (Model with Augmentation)
-# ------------------------------------------------------------
+
+# Plot the results
+
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 loss = history.history['loss']
